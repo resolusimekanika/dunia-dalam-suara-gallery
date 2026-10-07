@@ -11,8 +11,7 @@
       --left-offset: clamp(24px, 8vw, 125px);
       --right-safe-space: 24px;
       --image-gap: clamp(58px, 7vw, 110px);
-      --image-width: 520px;
-      --portrait-max-height: 720px;
+      --image-width: var(--gallery-max);
     }
 
     * { box-sizing: border-box; }
@@ -56,7 +55,7 @@
 
     .gallery-link {
       display: block;
-      width: min(var(--image-width), 100%);
+      width: 100%;
       max-width: 100%;
       text-decoration: none;
       line-height: 0;
@@ -71,17 +70,12 @@
       border: 0;
     }
 
-    .gallery-item.portrait .gallery-image {
-      max-height: var(--portrait-max-height);
-      object-fit: contain;
-    }
-
     /*
       Editable research text stays in the same simple column
       and carries the same width as the photographs.
     */
     .gallery-text {
-      width: min(var(--image-width), 100%);
+      width: 100%;
       margin: 0 auto;
       color: rgba(255,255,255,.82);
       font-size: 15px;
@@ -111,8 +105,7 @@
         --left-offset: 20px;
         --right-safe-space: 20px;
         --image-gap: 56px;
-        --image-width: 74vw;
-        --portrait-max-height: 620px;
+        --image-width: 100%;
       }
 
       #gallery, #status {
