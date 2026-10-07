@@ -51,8 +51,17 @@
     }
 
     .section {
-      width: 100%;
+      width: min(100%, var(--image-column));
       margin: 0 0 var(--section-gap);
+    }
+
+    /*
+      All image layouts share one fixed right-hand axis.
+      Smaller images vary only from the LEFT; their right edges stay aligned.
+    */
+    .section:not(.section--with-side-note) .visual {
+      margin-left: auto;
+      margin-right: 0;
     }
 
     .section:last-child {
@@ -109,6 +118,8 @@
       grid-template-columns: 1fr 1fr;
       gap: var(--pair-gap);
       align-items: start;
+      width: 100%;
+      margin-left: auto;
     }
 
     .visual--pair .gallery-item,
@@ -129,7 +140,8 @@
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: var(--cluster-gap);
-      width: min(100%, 780px);
+      width: min(78%, 682px);
+      margin-left: auto;
     }
 
     .visual--triptych .gallery-item,
@@ -151,15 +163,42 @@
     */
     .visual--medium {
       width: min(76%, 665px);
+      margin-left: auto;
     }
 
     .visual--small {
       width: min(56%, 490px);
+      margin-left: auto;
     }
 
+    /*
+      Final image: a quiet full-width closing banner.
+      The page view is cropped to a shallow cinematic strip,
+      while the click target still opens the untouched original.
+    */
     .visual--closing {
-      width: min(62%, 540px);
-      margin-left: min(18%, 150px);
+      width: 100%;
+      margin-left: 0;
+      overflow: hidden;
+    }
+
+    .visual--closing .gallery-link {
+      width: 100%;
+      aspect-ratio: 3.25 / 1;
+      overflow: hidden;
+    }
+
+    .visual--closing .gallery-item,
+    .visual--closing .gallery-image {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .visual--closing .gallery-image {
+      height: 100%;
+      max-height: none;
+      object-fit: cover;
+      object-position: center;
     }
 
     /*
@@ -196,6 +235,7 @@
       page into an asymmetrical collage.
     */
     .section--with-side-note {
+      width: 100%;
       display: grid;
       grid-template-columns: minmax(0, var(--image-column)) minmax(190px, 250px);
       column-gap: clamp(32px, 4vw, 62px);
@@ -266,15 +306,26 @@
 
       .visual--medium {
         width: 82%;
+        margin-left: auto;
       }
 
       .visual--small {
         width: 65%;
+        margin-left: auto;
+      }
+
+      .visual--triptych {
+        width: 88%;
+        margin-left: auto;
       }
 
       .visual--closing {
-        width: 70%;
-        margin-left: 18%;
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .visual--closing .gallery-link {
+        aspect-ratio: 2.25 / 1;
       }
 
       .gallery-item.portrait .gallery-image {
