@@ -7,61 +7,40 @@
 
   <style>
     :root {
-      --red: #ef0000;
-      --column-width: 875px;
-      --page-side: clamp(20px, 8vw, 125px);
-      --section-gap: clamp(34px, 4vw, 56px);
-      --pair-gap: clamp(12px, 1.5vw, 20px);
-      --cluster-gap: clamp(8px, 1vw, 12px);
-      --text-color: rgba(255,255,255,.88);
-      --text-muted: rgba(255,255,255,.68);
+      --gallery-max: 875px;
+      --left-offset: clamp(24px, 8vw, 125px);
+      --right-safe-space: 24px;
+      --image-gap: clamp(58px, 7vw, 110px);
+      --portrait-max-width: 520px;
+      --portrait-max-height: 720px;
+      --square-max-width: 680px;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
-    html,
-    body {
+    html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       min-height: 100%;
-      background: var(--red);
+      background: transparent;
     }
 
     body {
       overflow-x: hidden;
       font-family: Arial, Helvetica, sans-serif;
-      color: var(--text-color);
     }
 
-    /*
-      ONE COLUMN.
-      Every section begins and ends on exactly the same vertical axes.
-    */
     #gallery {
       width: min(
-        var(--column-width),
-        calc(100vw - (var(--page-side) * 2))
+        var(--gallery-max),
+        calc(100vw - var(--left-offset) - var(--right-safe-space))
       );
-      margin-left: var(--page-side);
-      margin-right: auto;
-      padding: 0 0 64px;
-    }
-
-    .section {
-      width: 100%;
-      margin: 0 0 var(--section-gap);
-    }
-
-    .section:last-child {
-      margin-bottom: 0;
-    }
-
-    .visual {
-      width: 100%;
-      margin: 0;
+      margin-left: var(--left-offset);
+      display: flex;
+      flex-direction: column;
+      gap: var(--image-gap);
+      padding: 0 0 40px;
     }
 
     .gallery-item {
@@ -72,179 +51,80 @@
 
     .gallery-link {
       display: block;
-      width: 100%;
-      line-height: 0;
+      width: fit-content;
+      max-width: 100%;
       text-decoration: none;
+      line-height: 0;
       cursor: zoom-in;
     }
 
     .gallery-image {
       display: block;
-      width: 100%;
-      height: auto;
       max-width: 100%;
+      height: auto;
       border: 0;
     }
 
-    /*
-      Tall images stay reasonable in height without escaping the column.
-      The image is contained inside a full-width aligned frame.
-    */
-    .gallery-item.portrait .gallery-link {
+    .gallery-item.landscape .gallery-link,
+    .gallery-item.landscape .gallery-image {
       width: 100%;
-      max-height: 760px;
-      overflow: hidden;
+    }
+
+    .gallery-item.portrait {
       display: flex;
       justify-content: center;
-      align-items: center;
+    }
+
+    .gallery-item.portrait .gallery-link {
+      width: auto;
+      max-width: min(var(--portrait-max-width), 100%);
     }
 
     .gallery-item.portrait .gallery-image {
-      width: 100%;
-      max-height: 760px;
+      width: auto;
+      max-width: min(var(--portrait-max-width), 100%);
+      max-height: var(--portrait-max-height);
       object-fit: contain;
     }
 
-    /*
-      03 + 04.
-      The OUTER block is exactly the same width as every other section.
-    */
-    .visual--pair {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--pair-gap);
-      width: 100%;
+    .gallery-item.square {
+      display: flex;
+      justify-content: flex-start;
     }
 
-    .visual--pair .gallery-item,
-    .visual--pair .gallery-link,
-    .visual--pair .gallery-image {
-      width: 100%;
-      max-width: 100%;
-    }
-
-    .visual--pair .gallery-image {
-      max-height: 620px;
-      object-fit: contain;
-      object-position: top center;
-    }
-
-    /*
-      08 + 09 + 10.
-      Again, same exact outer width.
-    */
-    .visual--triptych {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: var(--cluster-gap);
-      width: 100%;
-    }
-
-    .visual--triptych .gallery-item,
-    .visual--triptych .gallery-link,
-    .visual--triptych .gallery-image {
-      width: 100%;
-      max-width: 100%;
-    }
-
-    .visual--triptych .gallery-image {
-      max-height: 360px;
-      object-fit: contain;
-      object-position: top center;
-    }
-
-    /*
-      Research text also respects the SAME left and right axes.
-      No side columns, floating notes, or offset blocks.
-    */
-    .text {
-      width: 100%;
-      margin: 20px 0 0;
-      font-size: 15px;
-      line-height: 1.5;
-      color: var(--text-muted);
-      white-space: pre-line;
-    }
-
-    .text:empty {
-      display: none;
-    }
-
-    .text--quote {
-      font-size: clamp(17px, 1.35vw, 21px);
-      line-height: 1.4;
-      color: var(--text-color);
-      font-style: italic;
-    }
-
-    /*
-      Closing banner.
-      Same left and right axes as every other block.
-    */
-    .visual--closing {
-      width: 100%;
-      overflow: hidden;
-    }
-
-    .visual--closing .gallery-link {
-      width: 100%;
-      aspect-ratio: 3.2 / 1;
-      overflow: hidden;
-      display: block;
-    }
-
-    .visual--closing .gallery-image {
-      width: 100%;
-      height: 100%;
-      max-height: none;
-      object-fit: cover;
-      object-position: center;
+    .gallery-item.square .gallery-link,
+    .gallery-item.square .gallery-image {
+      width: min(var(--square-max-width), 100%);
     }
 
     #status {
       width: min(
-        var(--column-width),
-        calc(100vw - (var(--page-side) * 2))
+        var(--gallery-max),
+        calc(100vw - var(--left-offset) - var(--right-safe-space))
       );
-      margin-left: var(--page-side);
+      margin-left: var(--left-offset);
       padding: 12px 0 24px;
-      color: var(--text-muted);
+      color: rgba(255,255,255,.86);
       font: 13px/1.45 Arial, Helvetica, sans-serif;
     }
 
-    #status:empty {
-      display: none;
-    }
+    #status:empty { display: none; }
 
     @media (max-width: 700px) {
       :root {
-        --page-side: 20px;
-        --section-gap: 36px;
-        --pair-gap: 10px;
-        --cluster-gap: 8px;
+        --left-offset: 20px;
+        --right-safe-space: 20px;
+        --image-gap: 56px;
+        --portrait-max-width: 74vw;
+        --portrait-max-height: 620px;
       }
 
-      #gallery,
-      #status {
+      #gallery, #status {
         width: calc(100vw - 40px);
-        margin-left: 20px;
       }
 
-      .visual--pair {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .visual--triptych {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-
-      .gallery-item.portrait .gallery-link,
-      .gallery-item.portrait .gallery-image {
-        max-height: 620px;
-      }
-
-      .visual--closing .gallery-link {
-        aspect-ratio: 2.3 / 1;
+      .gallery-item.portrait {
+        justify-content: flex-start;
       }
     }
   </style>
@@ -257,33 +137,29 @@
 
   <div id="status" role="status" aria-live="polite"></div>
 
-  <script src="content.js"></script>
-
   <script>
     'use strict';
 
     const API = 'https://api.are.na/v3';
-    const CHANNEL_SLUG =
-      'post-acoustic-instrumentology-dunia-dalam-suara-2025';
+    const CHANNEL_SLUG = 'post-acoustic-instrumentology-dunia-dalam-suara-2025';
 
     const BLOCK_IDS = [
-      51152991,  // 01
-      40204761,  // 02
-      40204901,  // 03
-      40204902,  // 04
-      40204601,  // 05
-      40204792,  // 06
-      40204768,  // 07
-      40204764,  // 08
-      40204760,  // 09
-      40204759,  // 10
-      40204686,  // 11
-      40204666,  // 12
-      40204645,  // 13
-      51152992   // 14
+      51152991,
+      40204761,
+      40204901,
+      40204902,
+      40204601,
+      40204792,
+      40204768,
+      40204764,
+      40204760,
+      40204759,
+      40204686,
+      40204666,
+      40204645,
+      51152992
     ];
 
-    const TEXT = window.GALLERY_TEXT || {};
     const gallery = document.getElementById('gallery');
     const statusEl = document.getElementById('status');
 
@@ -292,12 +168,14 @@
     }
 
     async function api(path) {
-      const response = await fetch(API + path, {
+      const response = await fetch(`${API}${path}`, {
         headers: { Accept: 'application/json' }
       });
 
       if (!response.ok) {
-        throw new Error('HTTP ' + response.status);
+        const error = new Error(`HTTP ${response.status}`);
+        error.status = response.status;
+        throw error;
       }
 
       return response.json();
@@ -318,26 +196,31 @@
 
     function imageInfo(block) {
       const image =
-        (block && block.image) ||
-        (block && block.attachment && block.attachment.image) ||
-        (block && block.embed && block.embed.image) ||
+        block?.image ||
+        block?.attachment?.image ||
+        block?.embed?.image ||
         null;
 
-      if (!image || !image.src) return null;
+      if (!image) return null;
+
+      const original = image.src || null;
+      if (!original) return null;
+
+      const display =
+        variantSrc(image.large) ||
+        variantSrc(image.medium) ||
+        variantSrc(image.small) ||
+        original;
 
       return {
-        original: image.src,
-        display:
-          variantSrc(image.large) ||
-          variantSrc(image.medium) ||
-          variantSrc(image.small) ||
-          image.src,
+        original,
+        display,
         width: Number(image.width) || null,
         height: Number(image.height) || null,
         alt:
-          (block && block.alt_text) ||
-          (block && block.title) ||
-          image.filename ||
+          block?.alt_text ||
+          block?.title ||
+          image?.filename ||
           ''
       };
     }
@@ -351,13 +234,12 @@
       return 'square';
     }
 
-    function makeItem(block, originalIndex) {
+    function makeItem(block, index) {
       const info = imageInfo(block);
       if (!info) return null;
 
       const figure = document.createElement('figure');
-      figure.className =
-        'gallery-item ' + orientation(info.width, info.height);
+      figure.className = `gallery-item ${orientation(info.width, info.height)}`;
 
       const link = document.createElement('a');
       link.className = 'gallery-link';
@@ -365,81 +247,85 @@
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
       link.title = 'Open original image';
+      link.setAttribute(
+        'aria-label',
+        `Open image ${String(index + 1).padStart(2, '0')} at original resolution`
+      );
 
       const img = document.createElement('img');
       img.className = 'gallery-image';
       img.src = info.display;
       img.alt =
         info.alt ||
-        'Artwork documentation image ' +
-          String(originalIndex + 1).padStart(2, '0');
+        `Artwork documentation image ${String(index + 1).padStart(2, '0')}`;
       img.decoding = 'async';
-      img.loading = originalIndex < 2 ? 'eager' : 'lazy';
+      img.loading = index < 2 ? 'eager' : 'lazy';
 
-      if (originalIndex === 0) {
-        img.fetchPriority = 'high';
-      }
+      if (index === 0) img.fetchPriority = 'high';
 
       if (info.width && info.height) {
         img.width = info.width;
         img.height = info.height;
+      } else {
+        img.addEventListener('load', () => {
+          figure.classList.remove('unknown', 'portrait', 'landscape', 'square');
+          figure.classList.add(
+            orientation(img.naturalWidth, img.naturalHeight)
+          );
+        }, { once: true });
       }
 
       link.appendChild(img);
       figure.appendChild(link);
-
       return figure;
     }
 
     async function getBlocks() {
       try {
         const response = await api(
-          '/channels/' +
-            encodeURIComponent(CHANNEL_SLUG) +
-            '/contents?per=100&page=1'
+          `/channels/${encodeURIComponent(CHANNEL_SLUG)}/contents?per=100&page=1`
         );
 
-        const contents = Array.isArray(response && response.data)
+        const contents = Array.isArray(response?.data)
           ? response.data
           : [];
 
         const byId = new Map(
           contents
-            .filter(function (item) {
-              return item && item.id != null;
-            })
-            .map(function (item) {
-              return [Number(item.id), item];
-            })
+            .filter(item => item && item.id != null)
+            .map(item => [Number(item.id), item])
         );
 
-        const missing = BLOCK_IDS.filter(function (id) {
-          return !byId.has(id);
-        });
+        if (BLOCK_IDS.every(id => byId.has(id))) {
+          return BLOCK_IDS.map(id => byId.get(id));
+        }
+
+        const missing = BLOCK_IDS.filter(id => !byId.has(id));
 
         for (const id of missing) {
           try {
-            const block = await api('/blocks/' + id);
-
-            if (block && block.id != null) {
-              byId.set(Number(block.id), block);
-            }
+            const block = await api(`/blocks/${id}`);
+            if (block?.id != null) byId.set(Number(block.id), block);
           } catch (error) {
-            console.error('Are.na block ' + id + ':', error);
+            console.error(`Are.na block ${id}:`, error);
           }
         }
 
-        return BLOCK_IDS.map(function (id) {
-          return byId.get(id) || null;
-        });
+        return BLOCK_IDS.map(id => byId.get(id) || null);
 
       } catch (channelError) {
+        console.warn(
+          'Channel fetch failed; trying exact public block endpoints.',
+          channelError
+        );
+
         const blocks = [];
 
         for (const id of BLOCK_IDS) {
           try {
-            blocks.push(await api('/blocks/' + id));
+            blocks.push(await api(`/blocks/${id}`));
           } catch (error) {
+            console.error(`Are.na block ${id}:`, error);
             blocks.push(null);
           }
         }
@@ -448,127 +334,37 @@
       }
     }
 
-    function visual(className, items) {
-      const node = document.createElement('div');
-      node.className = 'visual' + (className ? ' ' + className : '');
-
-      items.forEach(function (item) {
-        if (item) node.appendChild(item);
-      });
-
-      return node;
-    }
-
-    function text(kind, value) {
-      const node = document.createElement('div');
-      node.className = 'text' + (kind ? ' text--' + kind : '');
-      node.textContent = (value || '').trim();
-      return node;
-    }
-
-    function section(visualNode, textNode) {
-      const node = document.createElement('section');
-      node.className = 'section';
-
-      if (visualNode) {
-        node.appendChild(visualNode);
-      }
-
-      if (textNode && textNode.textContent.trim()) {
-        node.appendChild(textNode);
-      }
-
-      gallery.appendChild(node);
-    }
-
     async function render() {
       setStatus('');
 
       try {
         const blocks = await getBlocks();
+
+        let count = 0;
         const missing = [];
 
-        const items = blocks.map(function (block, index) {
+        blocks.forEach((block, index) => {
           const item = block ? makeItem(block, index) : null;
 
           if (!item) {
             missing.push(BLOCK_IDS[index]);
+            return;
           }
 
-          return item;
+          gallery.appendChild(item);
+          count += 1;
         });
 
-        /*
-          Clean, inline sequence.
-          All section boundaries are identical.
-        */
-        section(
-          visual('', [items[0]]),
-          text('', TEXT.note01)
-        );
-
-        section(
-          visual('', [items[1]])
-        );
-
-        section(
-          visual('visual--pair', [items[2], items[3]]),
-          text('quote', TEXT.quote01)
-        );
-
-        section(
-          visual('', [items[4]])
-        );
-
-        section(
-          visual('', [items[5]]),
-          text('', TEXT.note02)
-        );
-
-        section(
-          visual('', [items[6]])
-        );
-
-        section(
-          visual('visual--triptych', [items[7], items[8], items[9]]),
-          text('', TEXT.paragraph01)
-        );
-
-        section(
-          visual('', [items[10]])
-        );
-
-        section(
-          visual('', [items[11]])
-        );
-
-        /*
-          14 comes before 13.
-          13 is the final banner.
-        */
-        section(
-          visual('', [items[13]])
-        );
-
-        section(
-          visual('visual--closing', [items[12]])
-        );
-
-        const count = items.filter(Boolean).length;
-
         if (count === 0) {
-          setStatus('Could not connect to Are.na from this browser.');
-        } else if (missing.length) {
           setStatus(
-            'Loaded ' +
-              count +
-              ' of ' +
-              BLOCK_IDS.length +
-              ' images. Missing block' +
-              (missing.length === 1 ? '' : 's') +
-              ': ' +
-              missing.join(', ') +
-              '.'
+            'Could not connect to Are.na from this browser.'
+          );
+          return;
+        }
+
+        if (missing.length) {
+          setStatus(
+            `Loaded ${count} of ${BLOCK_IDS.length} images. Missing block${missing.length === 1 ? '' : 's'}: ${missing.join(', ')}.`
           );
         }
 
