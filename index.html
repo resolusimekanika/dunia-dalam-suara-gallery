@@ -11,9 +11,8 @@
       --left-offset: clamp(24px, 8vw, 125px);
       --right-safe-space: 24px;
       --image-gap: clamp(58px, 7vw, 110px);
-      --portrait-max-width: 520px;
+      --image-width: 520px;
       --portrait-max-height: 720px;
-      --square-max-width: 680px;
     }
 
     * { box-sizing: border-box; }
@@ -43,15 +42,21 @@
       padding: 0 0 40px;
     }
 
+    /*
+      All images use the same displayed width.
+      Orientation changes height only—not width.
+    */
     .gallery-item {
       width: 100%;
       margin: 0;
       padding: 0;
+      display: flex;
+      justify-content: center;
     }
 
     .gallery-link {
       display: block;
-      width: fit-content;
+      width: min(var(--image-width), 100%);
       max-width: 100%;
       text-decoration: none;
       line-height: 0;
@@ -60,41 +65,32 @@
 
     .gallery-image {
       display: block;
+      width: 100%;
       max-width: 100%;
       height: auto;
       border: 0;
     }
 
-    .gallery-item.landscape .gallery-link,
-    .gallery-item.landscape .gallery-image {
-      width: 100%;
-    }
-
-    .gallery-item.portrait {
-      display: flex;
-      justify-content: center;
-    }
-
-    .gallery-item.portrait .gallery-link {
-      width: auto;
-      max-width: min(var(--portrait-max-width), 100%);
-    }
-
     .gallery-item.portrait .gallery-image {
-      width: auto;
-      max-width: min(var(--portrait-max-width), 100%);
       max-height: var(--portrait-max-height);
       object-fit: contain;
     }
 
-    .gallery-item.square {
-      display: flex;
-      justify-content: flex-start;
+    /*
+      Editable research text stays in the same simple column
+      and carries the same width as the photographs.
+    */
+    .gallery-text {
+      width: min(var(--image-width), 100%);
+      margin: 0 auto;
+      color: rgba(255,255,255,.82);
+      font-size: 15px;
+      line-height: 1.5;
+      white-space: pre-line;
     }
 
-    .gallery-item.square .gallery-link,
-    .gallery-item.square .gallery-image {
-      width: min(var(--square-max-width), 100%);
+    .gallery-text:empty {
+      display: none;
     }
 
     #status {
@@ -115,7 +111,7 @@
         --left-offset: 20px;
         --right-safe-space: 20px;
         --image-gap: 56px;
-        --portrait-max-width: 74vw;
+        --image-width: 74vw;
         --portrait-max-height: 620px;
       }
 
@@ -123,9 +119,6 @@
         width: calc(100vw - 40px);
       }
 
-      .gallery-item.portrait {
-        justify-content: flex-start;
-      }
     }
   </style>
 </head>
@@ -136,6 +129,8 @@
   </main>
 
   <div id="status" role="status" aria-live="polite"></div>
+
+  <script src="content.js"></script>
 
   <script>
     'use strict';
@@ -159,6 +154,15 @@
       40204645,
       51152992
     ];
+
+    const TEXT = window.GALLERY_TEXT || {};
+
+    const TEXT_AFTER = {
+      0: TEXT.after01,
+      3: TEXT.after04,
+      9: TEXT.after10,
+      13: TEXT.after14
+    };
 
     const gallery = document.getElementById('gallery');
     const statusEl = document.getElementById('status');
@@ -334,6 +338,13 @@
       }
     }
 
+    function makeText(value) {
+      const text = document.createElement('div');
+      text.className = 'gallery-text';
+      text.textContent = (value || '').trim();
+      return text;
+    }
+
     async function render() {
       setStatus('');
 
@@ -352,6 +363,11 @@
           }
 
           gallery.appendChild(item);
+
+          if (TEXT_AFTER[index] && TEXT_AFTER[index].trim()) {
+            gallery.appendChild(makeText(TEXT_AFTER[index]));
+          }
+
           count += 1;
         });
 
