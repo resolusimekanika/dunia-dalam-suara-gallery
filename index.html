@@ -8,22 +8,21 @@
   <style>
     :root {
       --red: #ef0000;
-      --stage-max: 1160px;
-      --image-column: 875px;
-      --left-offset: clamp(24px, 8vw, 125px);
-      --right-safe: 24px;
-
-      --section-gap: clamp(34px, 4.2vw, 62px);
-      --pair-gap: clamp(12px, 1.6vw, 22px);
+      --column-width: 875px;
+      --page-side: clamp(20px, 8vw, 125px);
+      --section-gap: clamp(34px, 4vw, 56px);
+      --pair-gap: clamp(12px, 1.5vw, 20px);
       --cluster-gap: clamp(8px, 1vw, 12px);
-
       --text-color: rgba(255,255,255,.88);
       --text-muted: rgba(255,255,255,.68);
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
-    html, body {
+    html,
+    body {
       margin: 0;
       padding: 0;
       width: 100%;
@@ -38,30 +37,22 @@
     }
 
     /*
-      The gallery is intentionally left-aligned.
-      The empty red field on the right belongs to the overall site composition.
+      ONE COLUMN.
+      Every section begins and ends on exactly the same vertical axes.
     */
     #gallery {
       width: min(
-        var(--stage-max),
-        calc(100vw - var(--left-offset) - var(--right-safe))
+        var(--column-width),
+        calc(100vw - (var(--page-side) * 2))
       );
-      margin-left: var(--left-offset);
+      margin-left: var(--page-side);
+      margin-right: auto;
       padding: 0 0 64px;
     }
 
     .section {
-      width: min(100%, var(--image-column));
+      width: 100%;
       margin: 0 0 var(--section-gap);
-    }
-
-    /*
-      All image layouts share one fixed right-hand axis.
-      Smaller images vary only from the LEFT; their right edges stay aligned.
-    */
-    .section:not(.section--with-side-note) .visual {
-      margin-left: auto;
-      margin-right: 0;
     }
 
     .section:last-child {
@@ -69,14 +60,14 @@
     }
 
     .visual {
-      width: min(100%, var(--image-column));
+      width: 100%;
+      margin: 0;
     }
 
     .gallery-item {
+      width: 100%;
       margin: 0;
       padding: 0;
-      width: 100%;
-      min-width: 0;
     }
 
     .gallery-link {
@@ -91,35 +82,38 @@
       display: block;
       width: 100%;
       height: auto;
+      max-width: 100%;
       border: 0;
     }
 
-    /* Portraits stay contained without feeling thumbnail-sized. */
-    .gallery-item.portrait {
-      display: flex;
-      justify-content: flex-start;
-    }
-
+    /*
+      Tall images stay reasonable in height without escaping the column.
+      The image is contained inside a full-width aligned frame.
+    */
     .gallery-item.portrait .gallery-link {
-      width: auto;
-      max-width: 100%;
+      width: 100%;
+      max-height: 760px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .gallery-item.portrait .gallery-image {
-      width: auto;
-      max-width: min(100%, 620px);
+      width: 100%;
       max-height: 760px;
       object-fit: contain;
     }
 
-    /* 03 + 04 */
+    /*
+      03 + 04.
+      The OUTER block is exactly the same width as every other section.
+    */
     .visual--pair {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: var(--pair-gap);
-      align-items: start;
       width: 100%;
-      margin-left: auto;
     }
 
     .visual--pair .gallery-item,
@@ -132,16 +126,18 @@
     .visual--pair .gallery-image {
       max-height: 620px;
       object-fit: contain;
-      object-position: top left;
+      object-position: top center;
     }
 
-    /* 08 + 09 + 10 */
+    /*
+      08 + 09 + 10.
+      Again, same exact outer width.
+    */
     .visual--triptych {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: var(--cluster-gap);
-      width: min(78%, 682px);
-      margin-left: auto;
+      width: 100%;
     }
 
     .visual--triptych .gallery-item,
@@ -154,64 +150,18 @@
     .visual--triptych .gallery-image {
       max-height: 360px;
       object-fit: contain;
-      object-position: top left;
+      object-position: top center;
     }
 
     /*
-      Controlled scale changes only.
-      These are subtle—not collage-like.
-    */
-    .visual--medium {
-      width: min(76%, 665px);
-      margin-left: auto;
-    }
-
-    .visual--small {
-      width: min(56%, 490px);
-      margin-left: auto;
-    }
-
-    /*
-      Final image: a quiet full-width closing banner.
-      The page view is cropped to a shallow cinematic strip,
-      while the click target still opens the untouched original.
-    */
-    .visual--closing {
-      width: 100%;
-      margin-left: 0;
-      overflow: hidden;
-    }
-
-    .visual--closing .gallery-link {
-      width: 100%;
-      aspect-ratio: 3.25 / 1;
-      overflow: hidden;
-    }
-
-    .visual--closing .gallery-item,
-    .visual--closing .gallery-image {
-      width: 100%;
-      max-width: 100%;
-    }
-
-    .visual--closing .gallery-image {
-      height: 100%;
-      max-height: none;
-      object-fit: cover;
-      object-position: center;
-    }
-
-    /*
-      Research text:
-      no boxes, borders, backgrounds, labels, or decorative treatment.
-      Just editorial text placed in the same rhythm as the images.
+      Research text also respects the SAME left and right axes.
+      No side columns, floating notes, or offset blocks.
     */
     .text {
-      width: min(470px, 82%);
-      margin-top: 22px;
+      width: 100%;
+      margin: 20px 0 0;
       font-size: 15px;
       line-height: 1.5;
-      letter-spacing: .003em;
       color: var(--text-muted);
       white-space: pre-line;
     }
@@ -221,79 +171,63 @@
     }
 
     .text--quote {
-      width: min(560px, 86%);
-      margin-left: 9%;
-      font-size: clamp(17px, 1.45vw, 21px);
+      font-size: clamp(17px, 1.35vw, 21px);
       line-height: 1.4;
       color: var(--text-color);
       font-style: italic;
     }
 
     /*
-      Only one section uses the right field actively.
-      This keeps the right margin meaningful without turning the whole
-      page into an asymmetrical collage.
+      Closing banner.
+      Same left and right axes as every other block.
     */
-    .section--with-side-note {
+    .visual--closing {
       width: 100%;
-      display: grid;
-      grid-template-columns: minmax(0, var(--image-column)) minmax(190px, 250px);
-      column-gap: clamp(32px, 4vw, 62px);
-      align-items: start;
+      overflow: hidden;
     }
 
-    .section--with-side-note .visual {
-      grid-column: 1;
+    .visual--closing .gallery-link {
+      width: 100%;
+      aspect-ratio: 3.2 / 1;
+      overflow: hidden;
+      display: block;
     }
 
-    .section--with-side-note .text {
-      grid-column: 2;
+    .visual--closing .gallery-image {
       width: 100%;
-      margin: 6px 0 0;
-      font-size: 14px;
-      line-height: 1.5;
+      height: 100%;
+      max-height: none;
+      object-fit: cover;
+      object-position: center;
     }
 
     #status {
       width: min(
-        var(--image-column),
-        calc(100vw - var(--left-offset) - var(--right-safe))
+        var(--column-width),
+        calc(100vw - (var(--page-side) * 2))
       );
-      margin-left: var(--left-offset);
+      margin-left: var(--page-side);
       padding: 12px 0 24px;
       color: var(--text-muted);
       font: 13px/1.45 Arial, Helvetica, sans-serif;
     }
 
-    #status:empty { display: none; }
-
-    @media (max-width: 920px) {
-      .section--with-side-note {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .section--with-side-note .visual,
-      .section--with-side-note .text {
-        grid-column: 1;
-      }
-
-      .section--with-side-note .text {
-        width: min(470px, 82%);
-        margin-top: 22px;
-      }
+    #status:empty {
+      display: none;
     }
 
     @media (max-width: 700px) {
       :root {
-        --left-offset: 20px;
-        --right-safe: 20px;
-        --section-gap: 38px;
-        --pair-gap: 12px;
+        --page-side: 20px;
+        --section-gap: 36px;
+        --pair-gap: 10px;
         --cluster-gap: 8px;
       }
 
-      #gallery {
+      #gallery,
+      #status {
         width: calc(100vw - 40px);
+        margin-left: 20px;
       }
 
       .visual--pair {
@@ -301,48 +235,16 @@
       }
 
       .visual--triptych {
-        width: 100%;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
-      .visual--medium {
-        width: 82%;
-        margin-left: auto;
-      }
-
-      .visual--small {
-        width: 65%;
-        margin-left: auto;
-      }
-
-      .visual--triptych {
-        width: 88%;
-        margin-left: auto;
-      }
-
-      .visual--closing {
-        width: 100%;
-        margin-left: 0;
+      .gallery-item.portrait .gallery-link,
+      .gallery-item.portrait .gallery-image {
+        max-height: 620px;
       }
 
       .visual--closing .gallery-link {
-        aspect-ratio: 2.25 / 1;
-      }
-
-      .gallery-item.portrait .gallery-image {
-        max-width: 78vw;
-        max-height: 660px;
-      }
-
-      .text,
-      .text--quote,
-      .section--with-side-note .text {
-        width: 88%;
-        margin-left: 0;
-      }
-
-      #status {
-        width: calc(100vw - 40px);
-        margin-left: 20px;
+        aspect-ratio: 2.3 / 1;
       }
     }
   </style>
@@ -442,6 +344,7 @@
 
     function orientation(width, height) {
       if (!width || !height) return 'unknown';
+
       const ratio = width / height;
       if (ratio < 0.86) return 'portrait';
       if (ratio > 1.14) return 'landscape';
@@ -473,24 +376,18 @@
       img.decoding = 'async';
       img.loading = originalIndex < 2 ? 'eager' : 'lazy';
 
-      if (originalIndex === 0) img.fetchPriority = 'high';
+      if (originalIndex === 0) {
+        img.fetchPriority = 'high';
+      }
 
       if (info.width && info.height) {
         img.width = info.width;
         img.height = info.height;
-      } else {
-        img.addEventListener('load', function () {
-          figure.classList.remove(
-            'unknown', 'portrait', 'landscape', 'square'
-          );
-          figure.classList.add(
-            orientation(img.naturalWidth, img.naturalHeight)
-          );
-        }, { once: true });
       }
 
       link.appendChild(img);
       figure.appendChild(link);
+
       return figure;
     }
 
@@ -523,6 +420,7 @@
         for (const id of missing) {
           try {
             const block = await api('/blocks/' + id);
+
             if (block && block.id != null) {
               byId.set(Number(block.id), block);
             }
@@ -552,7 +450,7 @@
 
     function visual(className, items) {
       const node = document.createElement('div');
-      node.className = 'visual ' + className;
+      node.className = 'visual' + (className ? ' ' + className : '');
 
       items.forEach(function (item) {
         if (item) node.appendChild(item);
@@ -568,12 +466,17 @@
       return node;
     }
 
-    function section(visualNode, textNode, extraClass) {
+    function section(visualNode, textNode) {
       const node = document.createElement('section');
-      node.className = 'section' + (extraClass ? ' ' + extraClass : '');
+      node.className = 'section';
 
-      if (visualNode) node.appendChild(visualNode);
-      if (textNode && textNode.textContent.trim()) node.appendChild(textNode);
+      if (visualNode) {
+        node.appendChild(visualNode);
+      }
+
+      if (textNode && textNode.textContent.trim()) {
+        node.appendChild(textNode);
+      }
 
       gallery.appendChild(node);
     }
@@ -587,26 +490,17 @@
 
         const items = blocks.map(function (block, index) {
           const item = block ? makeItem(block, index) : null;
-          if (!item) missing.push(BLOCK_IDS[index]);
+
+          if (!item) {
+            missing.push(BLOCK_IDS[index]);
+          }
+
           return item;
         });
 
         /*
-          Restrained editorial rhythm:
-          01 hero
-          short note
-          02
-          03+04
-          quote
-          05 hero
-          06 + one quiet side note
-          07 smaller
-          08+09+10 compact
-          longer research text
-          11
-          12 smaller
-          14 medium
-          13 smaller closing image
+          Clean, inline sequence.
+          All section boundaries are identical.
         */
         section(
           visual('', [items[0]]),
@@ -614,7 +508,7 @@
         );
 
         section(
-          visual('visual--medium', [items[1]])
+          visual('', [items[1]])
         );
 
         section(
@@ -627,13 +521,12 @@
         );
 
         section(
-          visual('visual--medium', [items[5]]),
-          text('', TEXT.note02),
-          'section--with-side-note'
+          visual('', [items[5]]),
+          text('', TEXT.note02)
         );
 
         section(
-          visual('visual--small', [items[6]])
+          visual('', [items[6]])
         );
 
         section(
@@ -642,16 +535,19 @@
         );
 
         section(
-          visual('visual--medium', [items[10]])
+          visual('', [items[10]])
         );
 
         section(
-          visual('visual--small', [items[11]])
+          visual('', [items[11]])
         );
 
-        /* 14 before 13, as requested */
+        /*
+          14 comes before 13.
+          13 is the final banner.
+        */
         section(
-          visual('visual--medium', [items[13]])
+          visual('', [items[13]])
         );
 
         section(
