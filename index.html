@@ -7,51 +7,87 @@
 
   <style>
     :root {
-      --gallery-max: 875px;
+      --page-red: #ef0000;
+
+      /* overall composition */
+      --stage-max: 1280px;
+      --image-column: 875px;
       --left-offset: clamp(24px, 8vw, 125px);
-      --right-safe-space: 24px;
-      --image-gap: clamp(58px, 7vw, 110px);
-      --portrait-max-width: 520px;
-      --portrait-max-height: 720px;
-      --square-max-width: 680px;
+      --right-safe-space: 28px;
+      --right-column-gap: clamp(38px, 5vw, 84px);
+      --section-gap: clamp(70px, 8vw, 118px);
+
+      /* image group spacing */
+      --pair-gap: clamp(14px, 2vw, 26px);
+      --cluster-gap: clamp(8px, 1.2vw, 14px);
+
+      /* typography */
+      --text-color: rgba(255,255,255,.92);
+      --muted-text: rgba(255,255,255,.64);
+      --text-size: 16px;
+      --text-leading: 1.45;
     }
 
     * { box-sizing: border-box; }
 
-    html, body {
+    html,
+    body {
       margin: 0;
       padding: 0;
       width: 100%;
       min-height: 100%;
-      background: transparent;
+      background: var(--page-red);
     }
 
     body {
       overflow-x: hidden;
+      color: var(--text-color);
       font-family: Arial, Helvetica, sans-serif;
     }
 
+    /*
+      The stage is deliberately NOT centered.
+      The left edge follows the Adobe mockup, while the right side stays
+      available as negative space and an occasional text field.
+    */
     #gallery {
       width: min(
-        var(--gallery-max),
+        var(--stage-max),
         calc(100vw - var(--left-offset) - var(--right-safe-space))
       );
       margin-left: var(--left-offset);
       display: flex;
       flex-direction: column;
-      gap: var(--image-gap);
-      padding: 0 0 40px;
+      gap: var(--section-gap);
+      padding: 0 0 80px;
+    }
+
+    .composition-row {
+      display: grid;
+      grid-template-columns:
+        minmax(0, var(--image-column))
+        minmax(200px, 1fr);
+      column-gap: var(--right-column-gap);
+      align-items: start;
+      width: 100%;
+    }
+
+    .visual {
+      grid-column: 1;
+      width: 100%;
+      min-width: 0;
     }
 
     .gallery-item {
-      width: 100%;
       margin: 0;
       padding: 0;
+      min-width: 0;
+      width: 100%;
     }
 
     .gallery-link {
       display: block;
-      width: fit-content;
+      width: 100%;
       max-width: 100%;
       text-decoration: none;
       line-height: 0;
@@ -60,71 +96,238 @@
 
     .gallery-image {
       display: block;
+      width: 100%;
       max-width: 100%;
       height: auto;
       border: 0;
     }
 
-    .gallery-item.landscape .gallery-link,
-    .gallery-item.landscape .gallery-image {
-      width: 100%;
-    }
-
-    .gallery-item.portrait {
-      display: flex;
-      justify-content: center;
-    }
-
-    .gallery-item.portrait .gallery-link {
-      width: auto;
-      max-width: min(var(--portrait-max-width), 100%);
-    }
-
+    /* Keep portrait images uncropped. */
     .gallery-item.portrait .gallery-image {
-      width: auto;
-      max-width: min(var(--portrait-max-width), 100%);
-      max-height: var(--portrait-max-height);
       object-fit: contain;
     }
 
-    .gallery-item.square {
-      display: flex;
-      justify-content: flex-start;
+    /*
+      TEXT BOXES
+      They intentionally have no visible border or background.
+      The red negative space is the "box."
+    */
+    .text-box {
+      grid-column: 2;
+      width: min(100%, 320px);
+      font-size: var(--text-size);
+      line-height: var(--text-leading);
+      white-space: pre-line;
+      color: var(--text-color);
+      letter-spacing: .005em;
     }
 
-    .gallery-item.square .gallery-link,
-    .gallery-item.square .gallery-image {
-      width: min(var(--square-max-width), 100%);
+    .text-box:empty {
+      display: none;
+    }
+
+    .text-box--note {
+      margin-top: clamp(90px, 12vw, 190px);
+      color: var(--muted-text);
+      font-size: 15px;
+    }
+
+    .text-box--quote {
+      margin-top: 18px;
+      font-size: clamp(18px, 1.6vw, 23px);
+      line-height: 1.32;
+      font-style: italic;
+    }
+
+    .text-box--research {
+      margin-top: 18px;
+      max-width: 360px;
+      color: var(--muted-text);
+    }
+
+    /* 01: hero */
+    .visual--hero {
+      width: 100%;
+    }
+
+    /* 02: medium and quiet */
+    .visual--02 {
+      width: 62%;
+    }
+
+    /* 03 + 04: paired, with unequal widths for asymmetry */
+    .visual--pair {
+      display: grid;
+      grid-template-columns: .88fr 1.12fr;
+      gap: var(--pair-gap);
+      align-items: start;
+      width: 78%;
+    }
+
+    .visual--pair .gallery-image {
+      max-height: 600px;
+      object-fit: contain;
+      object-position: top left;
+    }
+
+    /* 05: second hero */
+    .visual--05 {
+      width: 100%;
+    }
+
+    /* 06: medium left, leaving room to breathe */
+    .visual--06 {
+      width: 72%;
+    }
+
+    /* 07: deliberately small and pushed to the right edge of the image column */
+    .visual--07 {
+      width: 36%;
+      margin-left: auto;
+      margin-right: 4%;
+    }
+
+    /* 08 + 09 + 10: close, compact cluster */
+    .visual--triptych {
+      width: 76%;
+      display: grid;
+      grid-template-columns: 1fr .92fr 1fr;
+      gap: var(--cluster-gap);
+      align-items: start;
+    }
+
+    .visual--triptych .gallery-image {
+      max-height: 380px;
+      object-fit: contain;
+      object-position: top left;
+    }
+
+    /* 11: larger, but not another full-width hero */
+    .visual--11 {
+      width: 74%;
+      margin-left: 13%;
+    }
+
+    /* 12 small + 14 medium on the same line */
+    .visual--12-14 {
+      width: 92%;
+      display: grid;
+      grid-template-columns: .36fr .64fr;
+      gap: clamp(24px, 4vw, 54px);
+      align-items: end;
+    }
+
+    .visual--12-14 .gallery-item:first-child {
+      align-self: start;
+    }
+
+    .visual--12-14 .gallery-image {
+      object-fit: contain;
+      object-position: top left;
+    }
+
+    /* 13 closes the page quietly after 14, not as a hero. */
+    .visual--13 {
+      width: 45%;
+      margin-left: 48%;
     }
 
     #status {
       width: min(
-        var(--gallery-max),
+        var(--image-column),
         calc(100vw - var(--left-offset) - var(--right-safe-space))
       );
       margin-left: var(--left-offset);
       padding: 12px 0 24px;
-      color: rgba(255,255,255,.86);
+      color: var(--muted-text);
       font: 13px/1.45 Arial, Helvetica, sans-serif;
     }
 
     #status:empty { display: none; }
 
-    @media (max-width: 700px) {
+    @media (max-width: 1050px) {
+      .composition-row {
+        grid-template-columns: minmax(0, 1fr) minmax(180px, 260px);
+        column-gap: 34px;
+      }
+
+      .visual--pair,
+      .visual--triptych {
+        width: 88%;
+      }
+    }
+
+    @media (max-width: 760px) {
       :root {
         --left-offset: 20px;
         --right-safe-space: 20px;
-        --image-gap: 56px;
-        --portrait-max-width: 74vw;
-        --portrait-max-height: 620px;
+        --section-gap: 62px;
+        --pair-gap: 14px;
+        --cluster-gap: 10px;
       }
 
-      #gallery, #status {
+      #gallery {
         width: calc(100vw - 40px);
       }
 
-      .gallery-item.portrait {
-        justify-content: flex-start;
+      .composition-row {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 28px;
+      }
+
+      .visual,
+      .text-box {
+        grid-column: 1;
+      }
+
+      .text-box {
+        width: min(86%, 380px);
+        margin-top: 0;
+      }
+
+      .text-box--note,
+      .text-box--quote,
+      .text-box--research {
+        margin-left: 12%;
+      }
+
+      .visual--02 { width: 72%; }
+      .visual--pair { width: 100%; }
+      .visual--06 { width: 82%; }
+
+      .visual--07 {
+        width: 48%;
+        margin-right: 0;
+      }
+
+      .visual--triptych {
+        width: 100%;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .visual--triptych .gallery-item:last-child {
+        grid-column: 2;
+      }
+
+      .visual--11 {
+        width: 84%;
+        margin-left: 8%;
+      }
+
+      .visual--12-14 {
+        width: 100%;
+        grid-template-columns: .4fr .6fr;
+        gap: 16px;
+      }
+
+      .visual--13 {
+        width: 58%;
+        margin-left: 38%;
+      }
+
+      #status {
+        width: calc(100vw - 40px);
+        margin-left: 20px;
       }
     }
   </style>
@@ -137,28 +340,42 @@
 
   <div id="status" role="status" aria-live="polite"></div>
 
+  <!-- Edit content.js whenever you want to change the four text fields. -->
+  <script src="content.js"></script>
+
   <script>
     'use strict';
 
     const API = 'https://api.are.na/v3';
     const CHANNEL_SLUG = 'post-acoustic-instrumentology-dunia-dalam-suara-2025';
 
+    /*
+      Original image numbering is retained here.
+      Display order later intentionally places 14 before 13.
+    */
     const BLOCK_IDS = [
-      51152991,
-      40204761,
-      40204901,
-      40204902,
-      40204601,
-      40204792,
-      40204768,
-      40204764,
-      40204760,
-      40204759,
-      40204686,
-      40204666,
-      40204645,
-      51152992
+      51152991,  // 01
+      40204761,  // 02
+      40204901,  // 03
+      40204902,  // 04
+      40204601,  // 05
+      40204792,  // 06
+      40204768,  // 07
+      40204764,  // 08
+      40204760,  // 09
+      40204759,  // 10
+      40204686,  // 11
+      40204666,  // 12
+      40204645,  // 13
+      51152992   // 14
     ];
+
+    const TEXT = window.GALLERY_TEXT || {
+      note01: '[research note]\nAdd a short thought here.',
+      quote01: '“Add a quotation here.”',
+      note02: '[material / vibration / air / resonance]\nAdd another note here.',
+      paragraph01: '[research fragment]\nAdd a longer description here.'
+    };
 
     const gallery = document.getElementById('gallery');
     const statusEl = document.getElementById('status');
@@ -168,12 +385,12 @@
     }
 
     async function api(path) {
-      const response = await fetch(`${API}${path}`, {
+      const response = await fetch(API + path, {
         headers: { Accept: 'application/json' }
       });
 
       if (!response.ok) {
-        const error = new Error(`HTTP ${response.status}`);
+        const error = new Error('HTTP ' + response.status);
         error.status = response.status;
         throw error;
       }
@@ -196,13 +413,17 @@
 
     function imageInfo(block) {
       const image =
-        block?.image ||
-        block?.attachment?.image ||
-        block?.embed?.image ||
+        (block && block.image) ||
+        (block && block.attachment && block.attachment.image) ||
+        (block && block.embed && block.embed.image) ||
         null;
 
       if (!image) return null;
 
+      /*
+        image.src is used for the click target so the visitor receives
+        Are.na's original file rather than the displayed rendition.
+      */
       const original = image.src || null;
       if (!original) return null;
 
@@ -213,14 +434,14 @@
         original;
 
       return {
-        original,
-        display,
+        original: original,
+        display: display,
         width: Number(image.width) || null,
         height: Number(image.height) || null,
         alt:
-          block?.alt_text ||
-          block?.title ||
-          image?.filename ||
+          (block && block.alt_text) ||
+          (block && block.title) ||
+          image.filename ||
           ''
       };
     }
@@ -234,12 +455,14 @@
       return 'square';
     }
 
-    function makeItem(block, index) {
+    function makeItem(block, originalIndex) {
       const info = imageInfo(block);
       if (!info) return null;
 
       const figure = document.createElement('figure');
-      figure.className = `gallery-item ${orientation(info.width, info.height)}`;
+      figure.className =
+        'gallery-item ' + orientation(info.width, info.height);
+      figure.dataset.imageNumber = String(originalIndex + 1).padStart(2, '0');
 
       const link = document.createElement('a');
       link.className = 'gallery-link';
@@ -249,7 +472,9 @@
       link.title = 'Open original image';
       link.setAttribute(
         'aria-label',
-        `Open image ${String(index + 1).padStart(2, '0')} at original resolution`
+        'Open image ' +
+          String(originalIndex + 1).padStart(2, '0') +
+          ' at original resolution'
       );
 
       const img = document.createElement('img');
@@ -257,18 +482,21 @@
       img.src = info.display;
       img.alt =
         info.alt ||
-        `Artwork documentation image ${String(index + 1).padStart(2, '0')}`;
+        'Artwork documentation image ' +
+          String(originalIndex + 1).padStart(2, '0');
       img.decoding = 'async';
-      img.loading = index < 2 ? 'eager' : 'lazy';
+      img.loading = originalIndex < 2 ? 'eager' : 'lazy';
 
-      if (index === 0) img.fetchPriority = 'high';
+      if (originalIndex === 0) img.fetchPriority = 'high';
 
       if (info.width && info.height) {
         img.width = info.width;
         img.height = info.height;
       } else {
-        img.addEventListener('load', () => {
-          figure.classList.remove('unknown', 'portrait', 'landscape', 'square');
+        img.addEventListener('load', function () {
+          figure.classList.remove(
+            'unknown', 'portrait', 'landscape', 'square'
+          );
           figure.classList.add(
             orientation(img.naturalWidth, img.naturalHeight)
           );
@@ -283,35 +511,43 @@
     async function getBlocks() {
       try {
         const response = await api(
-          `/channels/${encodeURIComponent(CHANNEL_SLUG)}/contents?per=100&page=1`
+          '/channels/' +
+            encodeURIComponent(CHANNEL_SLUG) +
+            '/contents?per=100&page=1'
         );
 
-        const contents = Array.isArray(response?.data)
+        const contents = Array.isArray(response && response.data)
           ? response.data
           : [];
 
         const byId = new Map(
           contents
-            .filter(item => item && item.id != null)
-            .map(item => [Number(item.id), item])
+            .filter(function (item) {
+              return item && item.id != null;
+            })
+            .map(function (item) {
+              return [Number(item.id), item];
+            })
         );
 
-        if (BLOCK_IDS.every(id => byId.has(id))) {
-          return BLOCK_IDS.map(id => byId.get(id));
-        }
-
-        const missing = BLOCK_IDS.filter(id => !byId.has(id));
+        const missing = BLOCK_IDS.filter(function (id) {
+          return !byId.has(id);
+        });
 
         for (const id of missing) {
           try {
-            const block = await api(`/blocks/${id}`);
-            if (block?.id != null) byId.set(Number(block.id), block);
+            const block = await api('/blocks/' + id);
+            if (block && block.id != null) {
+              byId.set(Number(block.id), block);
+            }
           } catch (error) {
-            console.error(`Are.na block ${id}:`, error);
+            console.error('Are.na block ' + id + ':', error);
           }
         }
 
-        return BLOCK_IDS.map(id => byId.get(id) || null);
+        return BLOCK_IDS.map(function (id) {
+          return byId.get(id) || null;
+        });
 
       } catch (channelError) {
         console.warn(
@@ -323,9 +559,9 @@
 
         for (const id of BLOCK_IDS) {
           try {
-            blocks.push(await api(`/blocks/${id}`));
+            blocks.push(await api('/blocks/' + id));
           } catch (error) {
-            console.error(`Are.na block ${id}:`, error);
+            console.error('Are.na block ' + id + ':', error);
             blocks.push(null);
           }
         }
@@ -334,37 +570,120 @@
       }
     }
 
+    function textBox(kind, text) {
+      const box = document.createElement('aside');
+      box.className = 'text-box text-box--' + kind;
+      box.textContent = (text || '').trim();
+      return box;
+    }
+
+    function visual(className, items) {
+      const box = document.createElement('div');
+      box.className = 'visual ' + className;
+
+      items.forEach(function (item) {
+        if (item) box.appendChild(item);
+      });
+
+      return box;
+    }
+
+    function row(visualNode, textNode) {
+      const section = document.createElement('section');
+      section.className = 'composition-row';
+
+      if (visualNode) section.appendChild(visualNode);
+      if (textNode && textNode.textContent.trim()) section.appendChild(textNode);
+
+      gallery.appendChild(section);
+    }
+
     async function render() {
       setStatus('');
 
       try {
         const blocks = await getBlocks();
-
-        let count = 0;
         const missing = [];
 
-        blocks.forEach((block, index) => {
+        const items = blocks.map(function (block, index) {
           const item = block ? makeItem(block, index) : null;
-
-          if (!item) {
-            missing.push(BLOCK_IDS[index]);
-            return;
-          }
-
-          gallery.appendChild(item);
-          count += 1;
+          if (!item) missing.push(BLOCK_IDS[index]);
+          return item;
         });
 
-        if (count === 0) {
-          setStatus(
-            'Could not connect to Are.na from this browser.'
-          );
-          return;
-        }
+        /*
+          EDITORIAL SEQUENCE
+          ------------------
+          01 hero + note
+          02 medium
+          03 + 04 pair + quote
+          05 hero
+          06 medium + note
+          07 small/right
+          08 + 09 + 10 compact + research paragraph
+          11 medium-large
+          12 small + 14 medium
+          13 small/right ending
+        */
+        row(
+          visual('visual--hero', [items[0]]),
+          textBox('note', TEXT.note01)
+        );
 
-        if (missing.length) {
+        row(
+          visual('visual--02', [items[1]])
+        );
+
+        row(
+          visual('visual--pair', [items[2], items[3]]),
+          textBox('quote', TEXT.quote01)
+        );
+
+        row(
+          visual('visual--05', [items[4]])
+        );
+
+        row(
+          visual('visual--06', [items[5]]),
+          textBox('note', TEXT.note02)
+        );
+
+        row(
+          visual('visual--07', [items[6]])
+        );
+
+        row(
+          visual('visual--triptych', [items[7], items[8], items[9]]),
+          textBox('research', TEXT.paragraph01)
+        );
+
+        row(
+          visual('visual--11', [items[10]])
+        );
+
+        row(
+          visual('visual--12-14', [items[11], items[13]])
+        );
+
+        row(
+          visual('visual--13', [items[12]])
+        );
+
+        const count = items.filter(Boolean).length;
+
+        if (count === 0) {
+          setStatus('Could not connect to Are.na from this browser.');
+        } else if (missing.length) {
           setStatus(
-            `Loaded ${count} of ${BLOCK_IDS.length} images. Missing block${missing.length === 1 ? '' : 's'}: ${missing.join(', ')}.`
+            'Loaded ' +
+              count +
+              ' of ' +
+              BLOCK_IDS.length +
+              ' images. Missing block' +
+              (missing.length === 1 ? '' : 's') +
+              ': ' +
+              missing.join(', ') +
+              '.'
           );
         }
 
