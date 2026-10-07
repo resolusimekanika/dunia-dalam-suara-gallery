@@ -7,322 +7,286 @@
 
   <style>
     :root {
-      --page-red: #ef0000;
-
-      /* overall composition */
-      --stage-max: 1280px;
+      --red: #ef0000;
+      --stage-max: 1160px;
       --image-column: 875px;
       --left-offset: clamp(24px, 8vw, 125px);
-      --right-safe-space: 28px;
-      --right-column-gap: clamp(38px, 5vw, 84px);
-      --section-gap: clamp(70px, 8vw, 118px);
+      --right-safe: 24px;
 
-      /* image group spacing */
-      --pair-gap: clamp(14px, 2vw, 26px);
-      --cluster-gap: clamp(8px, 1.2vw, 14px);
+      --section-gap: clamp(34px, 4.2vw, 62px);
+      --pair-gap: clamp(12px, 1.6vw, 22px);
+      --cluster-gap: clamp(8px, 1vw, 12px);
 
-      /* typography */
-      --text-color: rgba(255,255,255,.92);
-      --muted-text: rgba(255,255,255,.64);
-      --text-size: 16px;
-      --text-leading: 1.45;
+      --text-color: rgba(255,255,255,.88);
+      --text-muted: rgba(255,255,255,.68);
     }
 
     * { box-sizing: border-box; }
 
-    html,
-    body {
+    html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       min-height: 100%;
-      background: var(--page-red);
+      background: var(--red);
     }
 
     body {
       overflow-x: hidden;
-      color: var(--text-color);
       font-family: Arial, Helvetica, sans-serif;
+      color: var(--text-color);
     }
 
     /*
-      The stage is deliberately NOT centered.
-      The left edge follows the Adobe mockup, while the right side stays
-      available as negative space and an occasional text field.
+      The gallery is intentionally left-aligned.
+      The empty red field on the right belongs to the overall site composition.
     */
     #gallery {
       width: min(
         var(--stage-max),
-        calc(100vw - var(--left-offset) - var(--right-safe-space))
+        calc(100vw - var(--left-offset) - var(--right-safe))
       );
       margin-left: var(--left-offset);
-      display: flex;
-      flex-direction: column;
-      gap: var(--section-gap);
-      padding: 0 0 80px;
+      padding: 0 0 64px;
     }
 
-    .composition-row {
-      display: grid;
-      grid-template-columns:
-        minmax(0, var(--image-column))
-        minmax(200px, 1fr);
-      column-gap: var(--right-column-gap);
-      align-items: start;
+    .section {
       width: 100%;
+      margin: 0 0 var(--section-gap);
+    }
+
+    .section:last-child {
+      margin-bottom: 0;
     }
 
     .visual {
-      grid-column: 1;
-      width: 100%;
-      min-width: 0;
+      width: min(100%, var(--image-column));
     }
 
     .gallery-item {
       margin: 0;
       padding: 0;
-      min-width: 0;
       width: 100%;
+      min-width: 0;
     }
 
     .gallery-link {
       display: block;
       width: 100%;
-      max-width: 100%;
-      text-decoration: none;
       line-height: 0;
+      text-decoration: none;
       cursor: zoom-in;
     }
 
     .gallery-image {
       display: block;
       width: 100%;
-      max-width: 100%;
       height: auto;
       border: 0;
     }
 
-    /* Keep portrait images uncropped. */
+    /* Portraits stay contained without feeling thumbnail-sized. */
+    .gallery-item.portrait {
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .gallery-item.portrait .gallery-link {
+      width: auto;
+      max-width: 100%;
+    }
+
     .gallery-item.portrait .gallery-image {
+      width: auto;
+      max-width: min(100%, 620px);
+      max-height: 760px;
       object-fit: contain;
     }
 
-    /*
-      TEXT BOXES
-      They intentionally have no visible border or background.
-      The red negative space is the "box."
-    */
-    .text-box {
-      grid-column: 2;
-      width: min(100%, 320px);
-      font-size: var(--text-size);
-      line-height: var(--text-leading);
-      white-space: pre-line;
-      color: var(--text-color);
-      letter-spacing: .005em;
-    }
-
-    .text-box:empty {
-      display: none;
-    }
-
-    .text-box--note {
-      margin-top: clamp(90px, 12vw, 190px);
-      color: var(--muted-text);
-      font-size: 15px;
-    }
-
-    .text-box--quote {
-      margin-top: 18px;
-      font-size: clamp(18px, 1.6vw, 23px);
-      line-height: 1.32;
-      font-style: italic;
-    }
-
-    .text-box--research {
-      margin-top: 18px;
-      max-width: 360px;
-      color: var(--muted-text);
-    }
-
-    /* 01: hero */
-    .visual--hero {
-      width: 100%;
-    }
-
-    /* 02: medium and quiet */
-    .visual--02 {
-      width: 62%;
-    }
-
-    /* 03 + 04: paired, with unequal widths for asymmetry */
+    /* 03 + 04 */
     .visual--pair {
       display: grid;
-      grid-template-columns: .88fr 1.12fr;
+      grid-template-columns: 1fr 1fr;
       gap: var(--pair-gap);
       align-items: start;
-      width: 78%;
+    }
+
+    .visual--pair .gallery-item,
+    .visual--pair .gallery-link,
+    .visual--pair .gallery-image {
+      width: 100%;
+      max-width: 100%;
     }
 
     .visual--pair .gallery-image {
-      max-height: 600px;
+      max-height: 620px;
       object-fit: contain;
       object-position: top left;
     }
 
-    /* 05: second hero */
-    .visual--05 {
-      width: 100%;
-    }
-
-    /* 06: medium left, leaving room to breathe */
-    .visual--06 {
-      width: 72%;
-    }
-
-    /* 07: deliberately small and pushed to the right edge of the image column */
-    .visual--07 {
-      width: 36%;
-      margin-left: auto;
-      margin-right: 4%;
-    }
-
-    /* 08 + 09 + 10: close, compact cluster */
+    /* 08 + 09 + 10 */
     .visual--triptych {
-      width: 76%;
       display: grid;
-      grid-template-columns: 1fr .92fr 1fr;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: var(--cluster-gap);
-      align-items: start;
+      width: min(100%, 780px);
+    }
+
+    .visual--triptych .gallery-item,
+    .visual--triptych .gallery-link,
+    .visual--triptych .gallery-image {
+      width: 100%;
+      max-width: 100%;
     }
 
     .visual--triptych .gallery-image {
-      max-height: 380px;
+      max-height: 360px;
       object-fit: contain;
       object-position: top left;
     }
 
-    /* 11: larger, but not another full-width hero */
-    .visual--11 {
-      width: 74%;
-      margin-left: 13%;
+    /*
+      Controlled scale changes only.
+      These are subtle—not collage-like.
+    */
+    .visual--medium {
+      width: min(76%, 665px);
     }
 
-    /* 12 small + 14 medium on the same line */
-    .visual--12-14 {
-      width: 92%;
+    .visual--small {
+      width: min(56%, 490px);
+    }
+
+    .visual--closing {
+      width: min(62%, 540px);
+      margin-left: min(18%, 150px);
+    }
+
+    /*
+      Research text:
+      no boxes, borders, backgrounds, labels, or decorative treatment.
+      Just editorial text placed in the same rhythm as the images.
+    */
+    .text {
+      width: min(470px, 82%);
+      margin-top: 22px;
+      font-size: 15px;
+      line-height: 1.5;
+      letter-spacing: .003em;
+      color: var(--text-muted);
+      white-space: pre-line;
+    }
+
+    .text:empty {
+      display: none;
+    }
+
+    .text--quote {
+      width: min(560px, 86%);
+      margin-left: 9%;
+      font-size: clamp(17px, 1.45vw, 21px);
+      line-height: 1.4;
+      color: var(--text-color);
+      font-style: italic;
+    }
+
+    /*
+      Only one section uses the right field actively.
+      This keeps the right margin meaningful without turning the whole
+      page into an asymmetrical collage.
+    */
+    .section--with-side-note {
       display: grid;
-      grid-template-columns: .36fr .64fr;
-      gap: clamp(24px, 4vw, 54px);
-      align-items: end;
+      grid-template-columns: minmax(0, var(--image-column)) minmax(190px, 250px);
+      column-gap: clamp(32px, 4vw, 62px);
+      align-items: start;
     }
 
-    .visual--12-14 .gallery-item:first-child {
-      align-self: start;
+    .section--with-side-note .visual {
+      grid-column: 1;
     }
 
-    .visual--12-14 .gallery-image {
-      object-fit: contain;
-      object-position: top left;
-    }
-
-    /* 13 closes the page quietly after 14, not as a hero. */
-    .visual--13 {
-      width: 45%;
-      margin-left: 48%;
+    .section--with-side-note .text {
+      grid-column: 2;
+      width: 100%;
+      margin: 6px 0 0;
+      font-size: 14px;
+      line-height: 1.5;
     }
 
     #status {
       width: min(
         var(--image-column),
-        calc(100vw - var(--left-offset) - var(--right-safe-space))
+        calc(100vw - var(--left-offset) - var(--right-safe))
       );
       margin-left: var(--left-offset);
       padding: 12px 0 24px;
-      color: var(--muted-text);
+      color: var(--text-muted);
       font: 13px/1.45 Arial, Helvetica, sans-serif;
     }
 
     #status:empty { display: none; }
 
-    @media (max-width: 1050px) {
-      .composition-row {
-        grid-template-columns: minmax(0, 1fr) minmax(180px, 260px);
-        column-gap: 34px;
+    @media (max-width: 920px) {
+      .section--with-side-note {
+        grid-template-columns: minmax(0, 1fr);
       }
 
-      .visual--pair,
-      .visual--triptych {
-        width: 88%;
+      .section--with-side-note .visual,
+      .section--with-side-note .text {
+        grid-column: 1;
+      }
+
+      .section--with-side-note .text {
+        width: min(470px, 82%);
+        margin-top: 22px;
       }
     }
 
-    @media (max-width: 760px) {
+    @media (max-width: 700px) {
       :root {
         --left-offset: 20px;
-        --right-safe-space: 20px;
-        --section-gap: 62px;
-        --pair-gap: 14px;
-        --cluster-gap: 10px;
+        --right-safe: 20px;
+        --section-gap: 38px;
+        --pair-gap: 12px;
+        --cluster-gap: 8px;
       }
 
       #gallery {
         width: calc(100vw - 40px);
       }
 
-      .composition-row {
-        grid-template-columns: minmax(0, 1fr);
-        row-gap: 28px;
-      }
-
-      .visual,
-      .text-box {
-        grid-column: 1;
-      }
-
-      .text-box {
-        width: min(86%, 380px);
-        margin-top: 0;
-      }
-
-      .text-box--note,
-      .text-box--quote,
-      .text-box--research {
-        margin-left: 12%;
-      }
-
-      .visual--02 { width: 72%; }
-      .visual--pair { width: 100%; }
-      .visual--06 { width: 82%; }
-
-      .visual--07 {
-        width: 48%;
-        margin-right: 0;
+      .visual--pair {
+        grid-template-columns: 1fr 1fr;
       }
 
       .visual--triptych {
         width: 100%;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .visual--triptych .gallery-item:last-child {
-        grid-column: 2;
+      .visual--medium {
+        width: 82%;
       }
 
-      .visual--11 {
-        width: 84%;
-        margin-left: 8%;
+      .visual--small {
+        width: 65%;
       }
 
-      .visual--12-14 {
-        width: 100%;
-        grid-template-columns: .4fr .6fr;
-        gap: 16px;
+      .visual--closing {
+        width: 70%;
+        margin-left: 18%;
       }
 
-      .visual--13 {
-        width: 58%;
-        margin-left: 38%;
+      .gallery-item.portrait .gallery-image {
+        max-width: 78vw;
+        max-height: 660px;
+      }
+
+      .text,
+      .text--quote,
+      .section--with-side-note .text {
+        width: 88%;
+        margin-left: 0;
       }
 
       #status {
@@ -340,19 +304,15 @@
 
   <div id="status" role="status" aria-live="polite"></div>
 
-  <!-- Edit content.js whenever you want to change the four text fields. -->
   <script src="content.js"></script>
 
   <script>
     'use strict';
 
     const API = 'https://api.are.na/v3';
-    const CHANNEL_SLUG = 'post-acoustic-instrumentology-dunia-dalam-suara-2025';
+    const CHANNEL_SLUG =
+      'post-acoustic-instrumentology-dunia-dalam-suara-2025';
 
-    /*
-      Original image numbering is retained here.
-      Display order later intentionally places 14 before 13.
-    */
     const BLOCK_IDS = [
       51152991,  // 01
       40204761,  // 02
@@ -370,13 +330,7 @@
       51152992   // 14
     ];
 
-    const TEXT = window.GALLERY_TEXT || {
-      note01: '[research note]\nAdd a short thought here.',
-      quote01: '“Add a quotation here.”',
-      note02: '[material / vibration / air / resonance]\nAdd another note here.',
-      paragraph01: '[research fragment]\nAdd a longer description here.'
-    };
-
+    const TEXT = window.GALLERY_TEXT || {};
     const gallery = document.getElementById('gallery');
     const statusEl = document.getElementById('status');
 
@@ -390,9 +344,7 @@
       });
 
       if (!response.ok) {
-        const error = new Error('HTTP ' + response.status);
-        error.status = response.status;
-        throw error;
+        throw new Error('HTTP ' + response.status);
       }
 
       return response.json();
@@ -418,24 +370,15 @@
         (block && block.embed && block.embed.image) ||
         null;
 
-      if (!image) return null;
-
-      /*
-        image.src is used for the click target so the visitor receives
-        Are.na's original file rather than the displayed rendition.
-      */
-      const original = image.src || null;
-      if (!original) return null;
-
-      const display =
-        variantSrc(image.large) ||
-        variantSrc(image.medium) ||
-        variantSrc(image.small) ||
-        original;
+      if (!image || !image.src) return null;
 
       return {
-        original: original,
-        display: display,
+        original: image.src,
+        display:
+          variantSrc(image.large) ||
+          variantSrc(image.medium) ||
+          variantSrc(image.small) ||
+          image.src,
         width: Number(image.width) || null,
         height: Number(image.height) || null,
         alt:
@@ -448,7 +391,6 @@
 
     function orientation(width, height) {
       if (!width || !height) return 'unknown';
-
       const ratio = width / height;
       if (ratio < 0.86) return 'portrait';
       if (ratio > 1.14) return 'landscape';
@@ -462,7 +404,6 @@
       const figure = document.createElement('figure');
       figure.className =
         'gallery-item ' + orientation(info.width, info.height);
-      figure.dataset.imageNumber = String(originalIndex + 1).padStart(2, '0');
 
       const link = document.createElement('a');
       link.className = 'gallery-link';
@@ -470,12 +411,6 @@
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
       link.title = 'Open original image';
-      link.setAttribute(
-        'aria-label',
-        'Open image ' +
-          String(originalIndex + 1).padStart(2, '0') +
-          ' at original resolution'
-      );
 
       const img = document.createElement('img');
       img.className = 'gallery-image';
@@ -550,18 +485,12 @@
         });
 
       } catch (channelError) {
-        console.warn(
-          'Channel fetch failed; trying exact public block endpoints.',
-          channelError
-        );
-
         const blocks = [];
 
         for (const id of BLOCK_IDS) {
           try {
             blocks.push(await api('/blocks/' + id));
           } catch (error) {
-            console.error('Are.na block ' + id + ':', error);
             blocks.push(null);
           }
         }
@@ -570,32 +499,32 @@
       }
     }
 
-    function textBox(kind, text) {
-      const box = document.createElement('aside');
-      box.className = 'text-box text-box--' + kind;
-      box.textContent = (text || '').trim();
-      return box;
-    }
-
     function visual(className, items) {
-      const box = document.createElement('div');
-      box.className = 'visual ' + className;
+      const node = document.createElement('div');
+      node.className = 'visual ' + className;
 
       items.forEach(function (item) {
-        if (item) box.appendChild(item);
+        if (item) node.appendChild(item);
       });
 
-      return box;
+      return node;
     }
 
-    function row(visualNode, textNode) {
-      const section = document.createElement('section');
-      section.className = 'composition-row';
+    function text(kind, value) {
+      const node = document.createElement('div');
+      node.className = 'text' + (kind ? ' text--' + kind : '');
+      node.textContent = (value || '').trim();
+      return node;
+    }
 
-      if (visualNode) section.appendChild(visualNode);
-      if (textNode && textNode.textContent.trim()) section.appendChild(textNode);
+    function section(visualNode, textNode, extraClass) {
+      const node = document.createElement('section');
+      node.className = 'section' + (extraClass ? ' ' + extraClass : '');
 
-      gallery.appendChild(section);
+      if (visualNode) node.appendChild(visualNode);
+      if (textNode && textNode.textContent.trim()) node.appendChild(textNode);
+
+      gallery.appendChild(node);
     }
 
     async function render() {
@@ -612,61 +541,70 @@
         });
 
         /*
-          EDITORIAL SEQUENCE
-          ------------------
-          01 hero + note
-          02 medium
-          03 + 04 pair + quote
+          Restrained editorial rhythm:
+          01 hero
+          short note
+          02
+          03+04
+          quote
           05 hero
-          06 medium + note
-          07 small/right
-          08 + 09 + 10 compact + research paragraph
-          11 medium-large
-          12 small + 14 medium
-          13 small/right ending
+          06 + one quiet side note
+          07 smaller
+          08+09+10 compact
+          longer research text
+          11
+          12 smaller
+          14 medium
+          13 smaller closing image
         */
-        row(
-          visual('visual--hero', [items[0]]),
-          textBox('note', TEXT.note01)
+        section(
+          visual('', [items[0]]),
+          text('', TEXT.note01)
         );
 
-        row(
-          visual('visual--02', [items[1]])
+        section(
+          visual('visual--medium', [items[1]])
         );
 
-        row(
+        section(
           visual('visual--pair', [items[2], items[3]]),
-          textBox('quote', TEXT.quote01)
+          text('quote', TEXT.quote01)
         );
 
-        row(
-          visual('visual--05', [items[4]])
+        section(
+          visual('', [items[4]])
         );
 
-        row(
-          visual('visual--06', [items[5]]),
-          textBox('note', TEXT.note02)
+        section(
+          visual('visual--medium', [items[5]]),
+          text('', TEXT.note02),
+          'section--with-side-note'
         );
 
-        row(
-          visual('visual--07', [items[6]])
+        section(
+          visual('visual--small', [items[6]])
         );
 
-        row(
+        section(
           visual('visual--triptych', [items[7], items[8], items[9]]),
-          textBox('research', TEXT.paragraph01)
+          text('', TEXT.paragraph01)
         );
 
-        row(
-          visual('visual--11', [items[10]])
+        section(
+          visual('visual--medium', [items[10]])
         );
 
-        row(
-          visual('visual--12-14', [items[11], items[13]])
+        section(
+          visual('visual--small', [items[11]])
         );
 
-        row(
-          visual('visual--13', [items[12]])
+        /* 14 before 13, as requested */
+        section(
+          visual('visual--medium', [items[13]])
+        );
+
+        section(
+          visual('visual--closing', [items[12]])
         );
 
         const count = items.filter(Boolean).length;
