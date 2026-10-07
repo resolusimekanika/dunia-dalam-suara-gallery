@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Post-Acoustic Instrumentology — Gallery</title>
+
+  <style>
+    :root {
+      --gallery-max: 875px;
+      --left-offset: clamp(24px, 8vw, 125px);
+      --right-safe-space: 24px;
+      --image-gap: clamp(58px, 7vw, 110px);
+      --portrait-max-width: 520px;
+      --portrait-max-height: 720px;
+      --square-max-width: 680px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      background: transparent;
+    }
+
+    body {
+      overflow-x: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    #gallery {
+      width: min(
+        var(--gallery-max),
+        calc(100vw - var(--left-offset) - var(--right-safe-space))
+      );
+      margin-left: var(--left-offset);
+      display: flex;
+      flex-direction: column;
+      gap: var(--image-gap);
+      padding: 0 0 40px;
+    }
+
+    .gallery-item {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    .gallery-link {
+      display: block;
+      width: fit-content;
+      max-width: 100%;
+      text-decoration: none;
+      line-height: 0;
+      cursor: zoom-in;
+    }
+
+    .gallery-image {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      border: 0;
+    }
+
+    .gallery-item.landscape .gallery-link,
+    .gallery-item.landscape .gallery-image {
+      width: 100%;
+    }
+
+    .gallery-item.portrait {
+      display: flex;
+      justify-content: center;
+    }
+
+    .gallery-item.portrait .gallery-link {
+      width: auto;
+      max-width: min(var(--portrait-max-width), 100%);
+    }
+
+    .gallery-item.portrait .gallery-image {
+      width: auto;
+      max-width: min(var(--portrait-max-width), 100%);
+      max-height: var(--portrait-max-height);
+      object-fit: contain;
+    }
+
+    .gallery-item.square {
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .gallery-item.square .gallery-link,
+    .gallery-item.square .gallery-image {
+      width: min(var(--square-max-width), 100%);
+    }
+
+    #status {
+      width: min(
+        var(--gallery-max),
+        calc(100vw - var(--left-offset) - var(--right-safe-space))
+      );
+      margin-left: var(--left-offset);
+      padding: 12px 0 24px;
+      color: rgba(255,255,255,.86);
+      font: 13px/1.45 Arial, Helvetica, sans-serif;
+    }
+
+    #status:empty { display: none; }
+
+    @media (max-width: 700px) {
+      :root {
+        --left-offset: 20px;
+        --right-safe-space: 20px;
+        --image-gap: 56px;
+        --portrait-max-width: 74vw;
+        --portrait-max-height: 620px;
+      }
+
+      #gallery, #status {
+        width: calc(100vw - 40px);
+      }
+
+      .gallery-item.portrait {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main id="gallery"
+    aria-label="Post-Acoustic Instrumentology: Dunia Dalam Suara [2025] image gallery">
+  </main>
+
+  <div id="status" role="status" aria-live="polite"></div>
+
+  <script>
+    'use strict';
+
+    const API = 'https://api.are.na/v3';
+    const CHANNEL_SLUG = 'post-acoustic-instrumentology-dunia-dalam-suara-2025';
+
+    const BLOCK_IDS = [
+      51152991,
+      40204761,
+      40204901,
+      40204902,
+      40204601,
+      40204792,
+      40204768,
+      40204764,
+      40204760,
+      40204759,
+      40204686,
+      40204666,
+      40204645,
+      51152992
+    ];
+
+    const gallery = document.getElementById('gallery');
+    const statusEl = document.getElementById('status');
+
+    function setStatus(message) {
+      statusEl.textContent = message || '';
+    }
+
+    async function api(path) {
+      const response = await fetch(`${API}${path}`, {
+        headers: { Accept: 'application/json' }
+      });
+
+      if (!response.ok) {
+        const error = new Error(`HTTP ${response.status}`);
+        error.status = response.status;
+        throw error;
+      }
+
+      return response.json();
+    }
+
+    function variantSrc(variant) {
+      if (!variant) return null;
+      if (typeof variant === 'string') return variant;
+
+      return (
+        variant.src ||
+        variant.src_2x ||
+        variant.src_1x ||
+        variant.url ||
+        null
+      );
+    }
+
+    function imageInfo(block) {
+      const image =
+        block?.image ||
+        block?.attachment?.image ||
+        block?.embed?.image ||
+        null;
+
+      if (!image) return null;
+
+      const original = image.src || null;
+      if (!original) return null;
+
+      const display =
+        variantSrc(image.large) ||
+        variantSrc(image.medium) ||
+        variantSrc(image.small) ||
+        original;
+
+      return {
+        original,
+        display,
+        width: Number(image.width) || null,
+        height: Number(image.height) || null,
+        alt:
+          block?.alt_text ||
+          block?.title ||
+          image?.filename ||
+          ''
+      };
+    }
+
+    function orientation(width, height) {
+      if (!width || !height) return 'unknown';
+
+      const ratio = width / height;
+      if (ratio < 0.86) return 'portrait';
+      if (ratio > 1.14) return 'landscape';
+      return 'square';
+    }
+
+    function makeItem(block, index) {
+      const info = imageInfo(block);
+      if (!info) return null;
+
+      const figure = document.createElement('figure');
+      figure.className = `gallery-item ${orientation(info.width, info.height)}`;
+
+      const link = document.createElement('a');
+      link.className = 'gallery-link';
+      link.href = info.original;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.title = 'Open original image';
+      link.setAttribute(
+        'aria-label',
+        `Open image ${String(index + 1).padStart(2, '0')} at original resolution`
+      );
+
+      const img = document.createElement('img');
+      img.className = 'gallery-image';
+      img.src = info.display;
+      img.alt =
+        info.alt ||
+        `Artwork documentation image ${String(index + 1).padStart(2, '0')}`;
+      img.decoding = 'async';
+      img.loading = index < 2 ? 'eager' : 'lazy';
+
+      if (index === 0) img.fetchPriority = 'high';
+
+      if (info.width && info.height) {
+        img.width = info.width;
+        img.height = info.height;
+      } else {
+        img.addEventListener('load', () => {
+          figure.classList.remove('unknown', 'portrait', 'landscape', 'square');
+          figure.classList.add(
+            orientation(img.naturalWidth, img.naturalHeight)
+          );
+        }, { once: true });
+      }
+
+      link.appendChild(img);
+      figure.appendChild(link);
+      return figure;
+    }
+
+    async function getBlocks() {
+      try {
+        const response = await api(
+          `/channels/${encodeURIComponent(CHANNEL_SLUG)}/contents?per=100&page=1`
+        );
+
+        const contents = Array.isArray(response?.data)
+          ? response.data
+          : [];
+
+        const byId = new Map(
+          contents
+            .filter(item => item && item.id != null)
+            .map(item => [Number(item.id), item])
+        );
+
+        if (BLOCK_IDS.every(id => byId.has(id))) {
+          return BLOCK_IDS.map(id => byId.get(id));
+        }
+
+        const missing = BLOCK_IDS.filter(id => !byId.has(id));
+
+        for (const id of missing) {
+          try {
+            const block = await api(`/blocks/${id}`);
+            if (block?.id != null) byId.set(Number(block.id), block);
+          } catch (error) {
+            console.error(`Are.na block ${id}:`, error);
+          }
+        }
+
+        return BLOCK_IDS.map(id => byId.get(id) || null);
+
+      } catch (channelError) {
+        console.warn(
+          'Channel fetch failed; trying exact public block endpoints.',
+          channelError
+        );
+
+        const blocks = [];
+
+        for (const id of BLOCK_IDS) {
+          try {
+            blocks.push(await api(`/blocks/${id}`));
+          } catch (error) {
+            console.error(`Are.na block ${id}:`, error);
+            blocks.push(null);
+          }
+        }
+
+        return blocks;
+      }
+    }
+
+    async function render() {
+      setStatus('');
+
+      try {
+        const blocks = await getBlocks();
+
+        let count = 0;
+        const missing = [];
+
+        blocks.forEach((block, index) => {
+          const item = block ? makeItem(block, index) : null;
+
+          if (!item) {
+            missing.push(BLOCK_IDS[index]);
+            return;
+          }
+
+          gallery.appendChild(item);
+          count += 1;
+        });
+
+        if (count === 0) {
+          setStatus(
+            'Could not connect to Are.na from this browser.'
+          );
+          return;
+        }
+
+        if (missing.length) {
+          setStatus(
+            `Loaded ${count} of ${BLOCK_IDS.length} images. Missing block${missing.length === 1 ? '' : 's'}: ${missing.join(', ')}.`
+          );
+        }
+
+      } catch (error) {
+        console.error(error);
+        setStatus('Could not connect to Are.na from this browser.');
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>
